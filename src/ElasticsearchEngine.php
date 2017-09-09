@@ -125,6 +125,7 @@ class ElasticsearchEngine extends Engine
      */
     protected function performSearch(Builder $builder, array $options = [])
     {
+        /*
         $params = [
             'index' => $this->index,
             'type' => $builder->index ?: $builder->model->searchableAs(),
@@ -133,6 +134,36 @@ class ElasticsearchEngine extends Engine
                     'bool' => [
                         'must' => [['query_string' => [ 'query' => "*{$builder->query}*"]]]
                     ]
+                ]
+            ]
+        ];
+        */
+
+        $params = [
+            'index' => $this->index,
+            'type' => $builder->index ?: $builder->model->searchableAs(),
+            'body' => [
+                'query' => [
+
+                    'multi_match' => [
+                        'query' => $builder->query,
+                        'fields' => ['title', 'actor']
+                    ]
+                    /*
+                    'match' => [
+                        'title' => $builder->query
+                    ]
+                    */
+                    /*
+                    'bool' => [
+                        'must' => [['query_string' => [ 'query' => "*{$builder->query}*"]]]
+                    ]
+                    */
+                    /*
+                    'query_string' => [
+                        'query' => $builder->query
+                    ]
+                    */
                 ]
             ]
         ];
