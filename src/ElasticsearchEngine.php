@@ -18,15 +18,23 @@ class ElasticsearchEngine extends Engine
     protected $index;
 
     /**
+     * Max results per shard.
+     *
+     * @var int
+     */
+    protected $terminate_after;
+
+    /**
      * Create a new engine instance.
      *
      * @param  \Elasticsearch\Client  $elastic
      * @return void
      */
-    public function __construct(Elastic $elastic, $index)
+    public function __construct(Elastic $elastic, $index, $terminate_after)
     {
         $this->elastic = $elastic;
         $this->index = $index;
+        $this->terminate_after = $terminate_after;
     }
 
     /**
@@ -125,7 +133,6 @@ class ElasticsearchEngine extends Engine
      */
     protected function performSearch(Builder $builder, array $options = [])
     {
-        /*
         $params = [
             'index' => $this->index,
             'type' => $builder->index ?: $builder->model->searchableAs(),
@@ -137,36 +144,21 @@ class ElasticsearchEngine extends Engine
                 ]
             ]
         ];
-        */
 
-        $params = [
-            'index' => $this->index,
-            'type' => $builder->index ?: $builder->model->searchableAs(),
-            'body' => [
-                'query' => [
+        if($this->terminate_after == 0)
+        {
+            $params['this->terminate_after'] = $this->terminate_after;
+        }
 
-                    'multi_match' => [
-                        'query' => $builder->query,
-                        'fields' => ['title', 'actor']
-                    ]
-                    /*
-                    'match' => [
-                        'title' => $builder->query
-                    ]
-                    */
-                    /*
-                    'bool' => [
-                        'must' => [['query_string' => [ 'query' => "*{$builder->query}*"]]]
-                    ]
-                    */
-                    /*
-                    'query_string' => [
-                        'query' => $builder->query
-                    ]
-                    */
-                ]
-            ]
-        ];
+        if(method_exists($builder->model, 'getElasticQuery'))
+        {
+            $query = $builder->model->getElasticQuery($builder->query);
+
+            if($query)
+            {
+                $params['body']['query'] = $query;
+            }
+        }
 
         if ($sort = $this->sort($builder)) {
             $params['body']['sort'] = $sort;
