@@ -147,7 +147,7 @@ class ElasticsearchEngine extends Engine
 
         if($this->terminate_after > 0)
         {
-            $params['this->terminate_after'] = $this->terminate_after;
+            $params['terminate_after'] = $this->terminate_after;
         }
 
         if(method_exists($builder->model, 'getElasticQuery'))
