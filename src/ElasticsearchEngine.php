@@ -1,5 +1,6 @@
 <?php
 
+/* count */
 namespace ScoutEngines\Elasticsearch;
 
 use Laravel\Scout\Builder;
